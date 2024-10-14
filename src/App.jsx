@@ -19,6 +19,7 @@ function App() {
     setParticipants(updatedParticipants);
   };
 
+  // Send matches to Netlify function
   const generateMatches = () => {
     const shuffled = [...participants].sort(() => 0.5 - Math.random());
     const result = shuffled.map((person, index) => ({
@@ -26,9 +27,11 @@ function App() {
       recipient: shuffled[(index + 1) % shuffled.length],
     }));
     setMatches(result);
-  
-    // Send matches to Netlify function
-    fetch('/.netlify/functions/send_matches', {
+
+    const baseUrl = window.location.origin;  // Dynamically get the current origin
+    const functionUrl = `${baseUrl}/netlify/functions/send_matches`;
+
+    fetch(functionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +45,8 @@ function App() {
       .catch((error) => {
         console.error('Error:', error);
       });
-  };  
+  };
+
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black flex flex-col items-center justify-center text-white overflow-hidden">
