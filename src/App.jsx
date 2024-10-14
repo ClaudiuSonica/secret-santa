@@ -29,7 +29,7 @@ function App() {
     setMatches(result);
 
     const baseUrl = window.location.origin;  // Dynamically get the current origin
-    const functionUrl = `${baseUrl}/netlify/functions/send_matches`;
+    const functionUrl = `${baseUrl}/.netlify/functions/send_matches`;
 
     fetch(functionUrl, {
       method: 'POST',
