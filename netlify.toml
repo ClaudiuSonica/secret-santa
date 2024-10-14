@@ -1,6 +1,6 @@
 [build]
-  functions = "secret-santa/netlify/functions"  # Path to Netlify functions
-  publish = "secret-santa/secret-santa/dist"    # Path to the Vite build output
+  functions = "netlify/functions"  # Path to Netlify functions
+  publish = "/dist"    # Path to the Vite build output
 
 
 [dev]
