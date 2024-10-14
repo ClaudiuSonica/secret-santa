@@ -57,17 +57,6 @@ function App() {
         onRemoveParticipant={removeParticipant}
         onGenerateMatches={generateMatches}
       />
-
-      {/* Display Matches (for development) */}
-      {matches.length > 0 && (
-        <div className="mt-8 space-y-4">
-          {matches.map(({ santa, recipient }, index) => (
-            <div key={index}>
-              🎁 {santa.name} ({santa.phone}) will gift {recipient.name} ({recipient.phone}) 🎁
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
