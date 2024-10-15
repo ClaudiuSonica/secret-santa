@@ -42,7 +42,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.statusCode !== 200) {
+        if (data.status !== 200) {
           toast.error(data.message);  // Display error message as toast
           return;
         } 

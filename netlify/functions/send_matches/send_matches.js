@@ -40,6 +40,7 @@ export async function handler(event, context) {
     return {
       statusCode: 200,
       body: JSON.stringify({
+        status: 200,
         message: 'Emailuri trimise cu succes! 🎉 Crăciun Fericit!',
         results
       })
@@ -50,6 +51,7 @@ export async function handler(event, context) {
       return {
         statusCode: 404,
         body: JSON.stringify({
+          status: 404,
           message: 'Nu s-a găsit utilizatorul... Verifică datele introduse.'
         })
       };
@@ -58,6 +60,7 @@ export async function handler(event, context) {
     return {
       statusCode: 500,
       body: JSON.stringify({
+        status: 500,
         message: 'Ups! Ceva nu a mers bine... Te rugăm să încerci din nou.',
         error: error.message
       })
