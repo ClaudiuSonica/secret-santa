@@ -12,7 +12,7 @@ export async function handler(event, context) {
     const emailPromises = matches.map(({ santa, recipient }) => {
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.to = [{ email: santa.email }];
-      sendSmtpEmail.sender = { email: 'your-email@example.com' };
+      sendSmtpEmail.sender = { email: 'sonix.web.dev@gmail.com' };
       sendSmtpEmail.subject = 'Your Secret Santa Assignment!';
       sendSmtpEmail.textContent = `Hey ${santa.name}, you will be gifting ${recipient.name} this year! 🎁`;
 
