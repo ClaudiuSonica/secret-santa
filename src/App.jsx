@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import MainSection from './components/organisms/MainSection';
 import Snowfall from './components/molecules/Snowfall';
 import ParticipantService from './utils/ParticipantService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [participants, setParticipants] = useState([]);
@@ -40,13 +42,18 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('Success:', data);
+        if (data.statusCode !== 200) {
+          toast.error(data.message);  // Display error message as toast
+          return;
+        } 
+        toast.success(data.message);  // Display success message as toast
+        setParticipants([]);  // Clear participants after successful match generation
       })
       .catch((error) => {
-        console.error('Error:', error);
+        const errorMessage = error.message || 'Ups! Ceva nu a mers bine... Te rugăm să încerci din nou.';  // Use custom error message if available
+        toast.error(errorMessage);  // Display error message as toast
       });
   };
-
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black flex flex-col items-center justify-center text-white overflow-hidden">
@@ -56,6 +63,17 @@ function App() {
         onAddParticipant={addParticipant}
         onRemoveParticipant={removeParticipant}
         onGenerateMatches={generateMatches}
+      />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
     </div>
   );
