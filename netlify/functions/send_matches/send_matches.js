@@ -1,35 +1,26 @@
-import { Vonage } from '@vonage/server-sdk';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-const vonage = new Vonage({
-  apiKey: process.env.VONAGE_API_KEY,
-  apiSecret: process.env.VONAGE_API_SECRET
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+defaultClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;  // Use your Brevo API key
 
 export async function handler(event, context) {
   try {
     const body = JSON.parse(event.body);
     const matches = body.matches;
 
-    // Create an array of promises for each SMS message
-    const smsPromises = matches.map(({ santa, recipient }) => {
-      const message = `Hey ${santa.name}, you will be gifting ${recipient.name} this year! 🎁`;
+    const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+    const emailPromises = matches.map(({ santa, recipient }) => {
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.to = [{ email: santa.email }];
+      sendSmtpEmail.sender = { email: 'your-email@example.com' };
+      sendSmtpEmail.subject = 'Your Secret Santa Assignment!';
+      sendSmtpEmail.textContent = `Hey ${santa.name}, you will be gifting ${recipient.name} this year! 🎁`;
 
-      return new Promise((resolve, reject) => {
-        vonage.sms.send(
-          { to: santa.phone, from: 'VonageAPI', text: message },
-          (err, responseData) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(responseData);
-            }
-          }
-        );
-      });
+      return emailApi.sendTransacEmail(sendSmtpEmail);
     });
 
-    // Wait for all SMS messages to be sent concurrently
-    const results = await Promise.all(smsPromises);
+    // Send all emails concurrently
+    const results = await Promise.all(emailPromises);
 
     return {
       statusCode: 200,

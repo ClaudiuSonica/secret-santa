@@ -3,16 +3,16 @@ class ParticipantService {
       this.participants = participants;
     }
   
-    addParticipant({ name, phone }) {
-      if (!name || !phone || this.participants.some((p) => p.phone === phone)) {
+    addParticipant({ name, email }) {
+      if (!name || !email || this.participants.some((p) => p.email === email)) {
         return this.participants; // Return the same array if invalid
       }
   
-      return [...this.participants, { name, phone }];
+      return [...this.participants, { name, email }];
     }
   
-    removeParticipant(phone) {
-      return this.participants.filter((p) => p.phone !== phone);
+    removeParticipant(email) {
+      return this.participants.filter((p) => p.email !== email);
     }
   }
   

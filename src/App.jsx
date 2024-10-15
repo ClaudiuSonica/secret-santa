@@ -14,8 +14,8 @@ function App() {
     setParticipants(updatedParticipants);
   };
 
-  const removeParticipant = (phone) => {
-    const updatedParticipants = participantService.removeParticipant(phone);
+  const removeParticipant = (email) => {
+    const updatedParticipants = participantService.removeParticipant(email);
     setParticipants(updatedParticipants);
   };
 
