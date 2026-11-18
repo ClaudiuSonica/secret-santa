@@ -1,13 +1,13 @@
 import js from '@eslint/js'
 import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
+import reactX from 'eslint-plugin-react-x'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist/**', 'node_modules/**', 'venv/**'] },
   {
     files: ['**/*.{js,jsx}'],
+    settings: reactX.configs.recommended.settings,
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -17,22 +17,21 @@ export default [
         sourceType: 'module',
       },
     },
-    settings: { react: { version: '18.3' } },
     plugins: {
-      react,
-      'react-hooks': reactHooks,
+      'react-x': reactX,
       'react-refresh': reactRefresh,
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...react.configs['jsx-runtime'].rules,
-      ...reactHooks.configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
+      ...reactX.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
     },
+  },
+  {
+    files: ['server/**/*.js', 'vite.config.js'],
+    languageOptions: { globals: globals.node },
   },
 ]

@@ -1,81 +1,87 @@
-import React, { useState } from 'react';
+import { useRef, useState } from 'react';
 import MainSection from './components/organisms/MainSection';
-import Snowfall from './components/molecules/Snowfall';
 import ParticipantService from './utils/ParticipantService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [participants, setParticipants] = useState([]);
-  const [matches, setMatches] = useState([]);
-
+  const [isSending, setIsSending] = useState(false);
+  const [hasSent, setHasSent] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const requestId = useRef(null);
   const participantService = new ParticipantService(participants);
 
   const addParticipant = (participant) => {
     const updatedParticipants = participantService.addParticipant(participant);
+    if (updatedParticipants === participants) {
+      toast.error('Această adresă de email este deja în listă.');
+      return false;
+    }
     setParticipants(updatedParticipants);
+    setHasSent(false);
+    setSuccessMessage('');
+    requestId.current = null;
+    return true;
   };
 
   const removeParticipant = (email) => {
-    const updatedParticipants = participantService.removeParticipant(email);
-    setParticipants(updatedParticipants);
+    setParticipants(participantService.removeParticipant(email));
+    setHasSent(false);
+    setSuccessMessage('');
+    requestId.current = null;
   };
 
-  // Send matches to Netlify function
-  const generateMatches = () => {
-    const shuffled = [...participants].sort(() => 0.5 - Math.random());
-    const result = shuffled.map((person, index) => ({
-      santa: person,
-      recipient: shuffled[(index + 1) % shuffled.length],
-    }));
-    setMatches(result);
+  const generateMatches = async () => {
+    if (isSending || participants.length < 3) return;
 
-    const baseUrl = window.location.origin;  // Dynamically get the current origin
-    const functionUrl = `${baseUrl}/.netlify/functions/send_matches`;
-
-    fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ matches: result }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status !== 200) {
-          toast.error(data.message);  // Display error message as toast
-          return;
-        } 
-        toast.success(data.message);  // Display success message as toast
-        setParticipants([]);  // Clear participants after successful match generation
-      })
-      .catch((error) => {
-        const errorMessage = error.message || 'Ups! Ceva nu a mers bine... Te rugăm să încerci din nou.';  // Use custom error message if available
-        toast.error(errorMessage);  // Display error message as toast
+    setIsSending(true);
+    setHasSent(false);
+    setSuccessMessage('');
+    try {
+      requestId.current ||= crypto.randomUUID();
+      const response = await fetch('/api/send-matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participants, requestId: requestId.current }),
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Trimiterea emailurilor a eșuat. Încearcă din nou.');
+
+      setParticipants([]);
+      setHasSent(true);
+      setSuccessMessage(data.message || 'Emailurile Secret Santa sunt pe drum!');
+      requestId.current = null;
+      toast.success(data.message || 'Emailurile au fost trimise.');
+    } catch (error) {
+      toast.error(error.message || 'Trimiterea emailurilor a eșuat. Încearcă din nou.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black flex flex-col items-center justify-center text-white overflow-hidden">
-      <Snowfall />
+    <>
       <MainSection
         participants={participants}
+        isSending={isSending}
+        hasSent={hasSent}
+        successMessage={successMessage}
         onAddParticipant={addParticipant}
         onRemoveParticipant={removeParticipant}
         onGenerateMatches={generateMatches}
       />
       <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={true}
+        position="top-center"
+        autoClose={4500}
+        newestOnTop
         closeOnClick
-        rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="light"
       />
-    </div>
+    </>
   );
 }
 

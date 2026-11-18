@@ -1,15 +1,15 @@
-import React from 'react';
-import Button from '../atoms/Button';
+import { FiArrowRight, FiLoader, FiMail } from 'react-icons/fi';
 
-const MatchGenerator = ({ participants, onGenerateMatches }) => {
+const MatchGenerator = ({ participants, isSending, onGenerateMatches }) => {
+  const ready = participants.length >= 3;
+
   return (
-    <>
-      {participants.length >= 3 && (
-        <Button className="mt-4 bg-green-400 hover:bg-green-600 text-gray-700" onClick={onGenerateMatches}> {/* Adjusted to mt-4 for better spacing */}
-          Generate Matches
-        </Button>
-      )}
-    </>
+    <div className="send-action">
+      {!ready && <span className="minimum-note">Mai adaugă {3 - participants.length} {3 - participants.length === 1 ? 'persoană' : 'persoane'} pentru extragere</span>}
+      <button className="send-button" type="button" onClick={onGenerateMatches} disabled={!ready || isSending}>
+        {isSending ? <><FiLoader className="spin" aria-hidden="true" /> Se trimit emailurile…</> : <><FiMail aria-hidden="true" /> Trimite extragerea <FiArrowRight className="button-arrow" aria-hidden="true" /></>}
+      </button>
+    </div>
   );
 };
 

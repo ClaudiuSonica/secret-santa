@@ -1,13 +1,21 @@
-import React from 'react';
-import ListItem from '../atoms/ListItem';
+import { FiX } from 'react-icons/fi';
 
-const ParticipantList = ({ participants, onRemoveParticipant }) => {
+const ParticipantList = ({ isSending, participants, onRemoveParticipant }) => {
+  if (!participants.length) return null;
+
   return (
-    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {participants.map(({ name, email }) => (
-        <ListItem key={email} name={name} email={email} onRemove={() => onRemoveParticipant(email)} />
+    <ul className="participant-list" aria-label="Participanți">
+      {participants.map(({ name, email, details }, index) => (
+        <li className="participant-row" key={email}>
+          <span className="participant-avatar" aria-hidden="true">{name.trim().charAt(0).toUpperCase()}</span>
+          <span className="participant-details"><strong>{name}</strong><span>{email}</span>{details && <small>Detalii: {details}</small>}</span>
+          <span className="participant-number">{String(index + 1).padStart(2, '0')}</span>
+          <button className="remove-button" type="button" onClick={() => onRemoveParticipant(email)} aria-label={`Elimină ${name}`} disabled={isSending}>
+            <FiX aria-hidden="true" />
+          </button>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 

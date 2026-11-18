@@ -1,4 +1,3 @@
-import React from 'react';
 import Button from './Button';
 import { FaTrash } from 'react-icons/fa';
 
